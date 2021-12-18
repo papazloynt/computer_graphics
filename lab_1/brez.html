@@ -1,0 +1,55 @@
+<HTML>
+<BODY>
+<canvas id="lab01" width="500" height="400" style="border:3px solid">
+</canvas>
+<script>
+        function Line(ctx, x0, y0, x1, y1, is_swap) {
+                var y = y0;
+                var x = x0;
+                var eps = 0;
+                while (x <= x1) {
+                    eps += 2 * Math.abs(y1 - y0)
+                    if (Math.abs(eps) >= Math.abs(x1 - x0)) {
+                        y += Math.sign(y1 - y0);
+                        eps -= 2 * Math.abs(x1 - x0);
+                    }
+                    x += Math.sign(x1 - x0);
+                    if (!is_swap) {
+                        ctx.fillRect(x, y, 1, 1);
+                    } else {
+                        ctx.fillRect(-y, x, 1, 1);
+                    }
+                }
+        }
+</script>
+
+<script>
+        var canvas = document.getElementById("lab01");
+        var ctx = canvas.getContext("2d");
+        ctx.fillStyle = '#FF0000';
+        var flag = false;
+        canvas.addEventListener("click", function(event) {
+                if (event.which) {
+                    if (!flag) {
+                        x0 = event.offsetX;
+                        y0 = event.offsetY;
+                        flag = true;
+                    } else {
+                        x1 = event.offsetX;
+                        y1 = event.offsetY;
+                        deltaY = Math.abs(y1 - y0);
+                        deltaX = Math.abs(x1 - x0);
+                        if (deltaX >= deltaY && x0 <= x1) {
+                            Line(ctx, x0, y0, x1, y1, false);
+                        } else if (deltaX >= deltaY && x0 > x1) {
+                            Line(ctx, x1, y1, x0, y0, false);
+                        } else if (deltaX <= deltaY && y0 <= y1) {
+                            Line(ctx, y0, -x0, y1, -x1, true);
+                        } else { Line(ctx, y1, -x1, y0, -x0, true); }
+                        flag = false;
+                    }  
+                }
+            });
+</script>
+</BODY>
+</HTML>
