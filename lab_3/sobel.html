@@ -1,0 +1,60 @@
+<HTML>
+<BODY>
+    <canvas id='origa' height='900' width='550'></canvas>
+    <canvas id='sobel' height='900' width='550'></canvas>
+    <script>
+        var canvas = document.getElementById('origa');
+        var canvasFltr = document.getElementById('sobel');
+        
+        var ctxOrgn = canvas.getContext('2d');
+        var ctxFltr = canvasFltr.getContext('2d');
+        
+        var img = new Image();
+        img.setAttribute('crossOrigin','');
+        // ШРЕК!!!
+        img.src = 'https://upload.wikimedia.org/wikipedia/ru/thumb/3/39/Shrek.jpg/800px-Shrek.jpg';
+            
+        img.onload = function() {
+            ctxOrgn.drawImage(img, 0, 0, canvas.width, canvas.height);
+            
+            var imgDataOrgn = ctxOrgn.getImageData(0, 0, canvas.width, canvas.height);
+            var imgDataFltr = ctxFltr.createImageData(canvas.width, canvas.height);
+            
+            for (var i = 0; i < canvas.height; i++) {
+                for (var j = 0; j < canvas.width; j++) {
+                    for (var k = 0; k < 3; k++) {
+                    	// Создаём матрицу 3х3
+                        var p = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+                        p[0] = imgDataOrgn.data[4 * ((i - 1) * canvas.width + j - 1) + k];
+                        p[1] = imgDataOrgn.data[4 * ((i - 1) * canvas.width + j) + k];
+                        p[2] = imgDataOrgn.data[4 * ((i - 1) * canvas.width + j + 1) + k];
+                        p[3] = imgDataOrgn.data[4 * (i * canvas.width + j - 1) + k];
+                        p[4] = imgDataOrgn.data[4 * (i * canvas.width + j) + k];
+                        p[5] = imgDataOrgn.data[4 * (i * canvas.width + j + 1) + k];
+                        p[6] = imgDataOrgn.data[4 * ((i + 1) * canvas.width + j - 1) + k];
+                        p[7] = imgDataOrgn.data[4 * ((i + 1) * canvas.width + j) + k];
+                        p[8] = imgDataOrgn.data[4 * ((i + 1) * canvas.width + j + 1) + k];
+                        
+                        // Считаем градиент
+                        var Sx = (-1) * p[0] + (0) * p[1] + (1) * p[2] +
+                        	 (-2) * p[3] + (0) * p[4] + 2 * p[5] +
+                        	 (-1) * p[6] + (0) * p[7] + 2 * p[8];
+                        
+                        var Sy = (-1) * p[0] + (-2) * p[1] + (-1) * p[2] +
+                         	 (0) * p[3] + (0) * p[4] + (0) * p[5] +
+                         	 (1) * p[6] + (2) * p[7] + (1) * p[8];
+                        
+                        var S = Math.sqrt(Sx * Sx + Sy * Sy);
+                        if (S < 255) {
+                            S = 0;
+                        }                        
+                        imgDataFltr.data[4 * (i * canvas.width + j) + k] = S;
+                    }
+                    imgDataFltr.data[4 * (i * canvas.width + j) + 3] = 255;
+                }
+            }
+            ctxFltr.putImageData(imgDataFltr, 0, 0);
+        }
+    </script>
+</BODY>
+</HTML>
