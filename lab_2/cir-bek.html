@@ -50,14 +50,21 @@
             }
 
 function BekerAlgorithm(xl1, yl1, xl2, yl2) {
-                var tmin = 1.1;
-                var tmax = -0.1;
+
+		if (xl1 > xl2) {
+                    [xl1, xl2] = [xl2, xl1];
+                    [yl1, yl2] = [yl2, yl1];
+                }
+
+                var tmin = 2;
+                var tmax = -1;
                 var imin;
                 var imax;
 
                 for (var i = 0; i < x.length - 1; i++) {
-                    var tmp = ((yl1 - yl2) * (x[i] - xl1) + (xl2 - xl1) * (y[i] - yl1)) / ((x[i + 1] - x[i]) * (yl2 - yl1) + (y[i + 1] - y[i]) * (xl1 - xl2))
-                    if (tmp <= 1 && tmp >= 0) {
+                    var tmp = ((yl1 - yl2) * (x[i] - xl1) + (xl2 - xl1) * (y[i] - yl1)) /
+                    	      ((x[i + 1] - x[i]) * (yl2 - yl1) + (y[i + 1] - y[i]) * (xl1 - xl2))
+                    if (tmp >= 0 && tmp <= 1) {
                         if (tmp < tmin) {
                             tmin = tmp;
                             imin = i;
@@ -75,6 +82,21 @@ function BekerAlgorithm(xl1, yl1, xl2, yl2) {
 
                 var xend = (x[imax + 1] - x[imax]) * tmax + x[imax];
                 var yend = (y[imax + 1] - y[imax]) * tmax + y[imax];
+                
+                if (xstart > xend) {
+                    [xstart, xend] = [xend, xstart];
+                    [ystart, yend] = [yend, ystart];
+                }
+                
+                if (xstart < xl1 && xl1 < xend) {
+                    xstart = xl1;
+                    ystart = yl1;
+                }
+                
+                if (xstart < xl2 && xl2 < xend) {
+                    xend = xl2;
+                    yend = yl2;
+                }
 
                 ctx.fillStyle = "#008000";
                 Line(xstart, ystart, xend, yend);
